@@ -73,7 +73,7 @@ extern "C" {
 /**
   * @brief in XO mode, set internal capacitor (from 0x00 to 0x2F starting 11.2pF with 0.47pF steps)
   */
-#define XTAL_DEFAULT_CAP_VALUE      0x20
+#define XTAL_DEFAULT_CAP_VALUE      0x10
 
 /**
   * @brief Frequency error (in Hz) can be compensated here.

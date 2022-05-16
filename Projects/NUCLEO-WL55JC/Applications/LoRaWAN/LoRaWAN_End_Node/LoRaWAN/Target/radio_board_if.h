@@ -46,6 +46,7 @@ extern "C" {
 #define RBI_CONF_RFO_LP_HP  0
 #define RBI_CONF_RFO_LP     1
 #define RBI_CONF_RFO_HP     2
+#define RAK3172_RF_CHANNEL_SWITCH  1
 #else
 /* USER CODE BEGIN Board Definition */
 #error user to provide its board definitions
@@ -61,7 +62,11 @@ extern "C" {
 
 /* Indicates the type of switch between the ones proposed by CONFIG Constants
  */
-#define RBI_CONF_RFO                        RBI_CONF_RFO_LP_HP
+#if defined(RAK3172_RF_CHANNEL_SWITCH)
+  #define RBI_CONF_RFO                        RBI_CONF_RFO_HP
+#else
+  #define RBI_CONF_RFO                        RBI_CONF_RFO_LP_HP
+#endif
 
 /* Radio maximum wakeup time (in ms) */
 #define RF_WAKEUP_TIME                     10U
@@ -70,7 +75,7 @@ extern "C" {
  * 0: TCXO not supported
  * 1: TCXO supported
  */
-#define IS_TCXO_SUPPORTED                   1U
+#define IS_TCXO_SUPPORTED                   0U
 
 /* Indicates whether or not DCDC is supported by the board
  * 0: DCDC not supported
@@ -90,6 +95,18 @@ extern "C" {
 /* and define USE_BSP_DRIVER in the preprocessor definitions  or in platform.h */
 
 #elif defined(MX_NUCLEO_WL55JC1)
+
+#if defined(RAK3172_RF_CHANNEL_SWITCH)
+  #define RF_SW_CTRL1_PIN                          GPIO_PIN_8
+  #define RF_SW_CTRL1_GPIO_PORT                    GPIOB
+  #define RF_SW_CTRL1_GPIO_CLK_ENABLE()            __HAL_RCC_GPIOB_CLK_ENABLE()
+  #define RF_SW_CTRL1_GPIO_CLK_DISABLE()           __HAL_RCC_GPIOB_CLK_DISABLE()
+
+  #define RF_SW_CTRL2_PIN                          GPIO_PIN_13
+  #define RF_SW_CTRL2_GPIO_PORT                    GPIOC
+  #define RF_SW_CTRL2_GPIO_CLK_ENABLE()            __HAL_RCC_GPIOC_CLK_ENABLE()
+  #define RF_SW_CTRL2_GPIO_CLK_DISABLE()           __HAL_RCC_GPIOC_CLK_DISABLE()
+#else
 #define RF_SW_CTRL3_PIN                          GPIO_PIN_3
 #define RF_SW_CTRL3_GPIO_PORT                    GPIOC
 #define RF_SW_CTRL3_GPIO_CLK_ENABLE()            __HAL_RCC_GPIOC_CLK_ENABLE()
@@ -104,6 +121,7 @@ extern "C" {
 #define RF_SW_CTRL2_GPIO_PORT                    GPIOC
 #define RF_SW_CTRL2_GPIO_CLK_ENABLE()            __HAL_RCC_GPIOC_CLK_ENABLE()
 #define RF_SW_CTRL2_GPIO_CLK_DISABLE()           __HAL_RCC_GPIOC_CLK_DISABLE()
+#endif
 
 /* To be checked vs TCXO management in RCC config */
 #define RF_TCXO_VCC_PIN                          GPIO_PIN_0
