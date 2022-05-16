@@ -76,7 +76,24 @@ int32_t RBI_Init(void)
   /* 2/ Or implement RBI_Init here */
   int32_t retcode = 0;
   /* USER CODE BEGIN RBI_Init_2 */
-#warning user to provide its board code or to call his board driver functions
+  #if defined(RAK3172_RF_CHANNEL_SWITCH)
+    /* Enable the Radio Switch Clock */
+    RF_SW_CTRL1_GPIO_CLK_ENABLE();
+    RF_SW_CTRL2_GPIO_CLK_ENABLE();
+    /* Configure the Radio Switch pin */
+    gpio_init_structure.Pin   = RF_SW_CTRL1_PIN;
+    gpio_init_structure.Mode  = GPIO_MODE_OUTPUT_PP;
+    gpio_init_structure.Pull  = GPIO_NOPULL;
+    gpio_init_structure.Speed = GPIO_SPEED_FREQ_VERY_HIGH;
+    HAL_GPIO_Init(RF_SW_CTRL1_GPIO_PORT, &gpio_init_structure);
+    gpio_init_structure.Pin = RF_SW_CTRL2_PIN;
+    HAL_GPIO_Init(RF_SW_CTRL2_GPIO_PORT, &gpio_init_structure);
+
+    HAL_GPIO_WritePin(RF_SW_CTRL2_GPIO_PORT, RF_SW_CTRL2_PIN, GPIO_PIN_RESET);
+    HAL_GPIO_WritePin(RF_SW_CTRL1_GPIO_PORT, RF_SW_CTRL1_PIN, GPIO_PIN_RESET);
+  #else
+    #warning user to provide its board code or to call his board driver functions
+  #endif
   /* USER CODE END RBI_Init_2 */
   return retcode;
 #endif  /* USE_BSP_DRIVER  */
@@ -101,7 +118,18 @@ int32_t RBI_DeInit(void)
   /* 2/ Or implement RBI_DeInit here */
   int32_t retcode = 0;
   /* USER CODE BEGIN RBI_DeInit_2 */
-#warning user to provide its board code or to call his board driver functions
+  #if defined(RAK3172_RF_CHANNEL_SWITCH)
+    RF_SW_CTRL1_GPIO_CLK_ENABLE();
+    RF_SW_CTRL2_GPIO_CLK_ENABLE();
+    /* Turn off switch */
+    HAL_GPIO_WritePin(RF_SW_CTRL1_GPIO_PORT, RF_SW_CTRL1_PIN, GPIO_PIN_RESET);
+    HAL_GPIO_WritePin(RF_SW_CTRL2_GPIO_PORT, RF_SW_CTRL2_PIN, GPIO_PIN_RESET);
+    /* DeInit the Radio Switch pin */
+    HAL_GPIO_DeInit(RF_SW_CTRL1_GPIO_PORT, RF_SW_CTRL1_PIN);
+    HAL_GPIO_DeInit(RF_SW_CTRL2_GPIO_PORT, RF_SW_CTRL2_PIN);
+  #else
+    #warning user to provide its board code or to call his board driver functions
+  #endif
   /* USER CODE END RBI_DeInit_2 */
   return retcode;
 #endif  /* USE_BSP_DRIVER */
@@ -127,7 +155,43 @@ int32_t RBI_ConfigRFSwitch(RBI_Switch_TypeDef Config)
   /* 2/ Or implement RBI_ConfigRFSwitch here */
   int32_t retcode = 0;
   /* USER CODE BEGIN RBI_ConfigRFSwitch_2 */
-#warning user to provide its board code or to call his board driver functions
+  #if defined(RAK3172_RF_CHANNEL_SWITCH)
+    switch (Config)
+    {
+      case RBI_SWITCH_OFF:
+      {
+        /* Turn off switch */
+        HAL_GPIO_WritePin(RF_SW_CTRL1_GPIO_PORT, RF_SW_CTRL1_PIN, GPIO_PIN_RESET);
+        HAL_GPIO_WritePin(RF_SW_CTRL2_GPIO_PORT, RF_SW_CTRL2_PIN, GPIO_PIN_RESET);
+        break;
+      }
+      case RBI_SWITCH_RX:
+      {
+        /*Turns On in Rx Mode the RF Switch */
+        HAL_GPIO_WritePin(RF_SW_CTRL1_GPIO_PORT, RF_SW_CTRL1_PIN, GPIO_PIN_SET);
+        HAL_GPIO_WritePin(RF_SW_CTRL2_GPIO_PORT, RF_SW_CTRL2_PIN, GPIO_PIN_RESET);
+        break;
+      }
+      case RBI_SWITCH_RFO_LP:
+      {
+        /*Turns On in Tx Low Power the RF Switch */
+        HAL_GPIO_WritePin(RF_SW_CTRL1_GPIO_PORT, RF_SW_CTRL1_PIN, GPIO_PIN_RESET);
+        HAL_GPIO_WritePin(RF_SW_CTRL2_GPIO_PORT, RF_SW_CTRL2_PIN, GPIO_PIN_SET);
+        break;
+      }
+      case RBI_SWITCH_RFO_HP:
+      {
+        /*Turns On in Tx High Power the RF Switch */
+        HAL_GPIO_WritePin(RF_SW_CTRL1_GPIO_PORT, RF_SW_CTRL1_PIN, GPIO_PIN_RESET);
+        HAL_GPIO_WritePin(RF_SW_CTRL2_GPIO_PORT, RF_SW_CTRL2_PIN, GPIO_PIN_SET);
+        break;
+      }
+      default:
+        break;
+    }
+  #else
+    #warning user to provide its board code or to call his board driver functions
+  #endif
   /* USER CODE END RBI_ConfigRFSwitch_2 */
   return retcode;
 #endif  /* USE_BSP_DRIVER */

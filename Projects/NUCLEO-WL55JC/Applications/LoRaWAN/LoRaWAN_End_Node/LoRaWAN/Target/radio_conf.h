@@ -102,7 +102,8 @@ extern "C" {
 #define DCDC_ENABLE                 ( 1UL )
 
 /* USER CODE BEGIN EC */
-
+#undef XTAL_DEFAULT_CAP_VALUE
+#define XTAL_DEFAULT_CAP_VALUE      ( 0x10UL )
 /* USER CODE END EC */
 
 /* External variables --------------------------------------------------------*/
